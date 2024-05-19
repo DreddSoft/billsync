@@ -1,8 +1,9 @@
+import java.sql.*;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
-public class Grupo {
+public class Grupo  {
 
     /* ---- VARIABLES ---- */
     private String nombre;
@@ -10,14 +11,16 @@ public class Grupo {
     private Set<Usuario> miembros;
     private List<Gasto> gastos;
 
+    private BaseDeDatos bd;
+
     /* ---- CONSTRUCTORES ---- */
-    public Grupo(String nombre, Usuario admin, Set<Usuario> miembros, List<Evento> eventos) {
+    public Grupo(String nombre, Usuario admin, Set<Usuario> miembros, List<Gasto> gastos) throws SQLException {
         this.nombre = nombre;
         this.admin = admin;
         this.miembros = miembros;
-        this.eventos = eventos;
+        this.gastos = gastos;
     }
-    public Grupo() {
+    public Grupo() throws SQLException {
     }
     /* ---- GETTERS Y SETTERS ---- */
     public String getNombre() {
@@ -44,11 +47,11 @@ public class Grupo {
         this.miembros = miembros;
     }
 
-    public List<Evento> getEventos() {
-        return eventos;
+    public List<Gasto> getGastos() {
+        return gastos;
     }
-    public void setEventos(List<Evento> eventos) {
-        this.eventos = eventos;
+    public void setGastos(List<Gasto> gastos) {
+        this.gastos = gastos;
     }
 
     /* ---- GETTERS Y SETTERS ---- */
@@ -77,15 +80,36 @@ public class Grupo {
     }
 
     /* ---- METODOS PROPIOS ---- */
-    public String estableceNombreDeGrupo() {
+    public void estableceNombreDeGrupo() {
 
-        // TODO: añadir método nombreGrupochico de MenuGrupo
+        // TODO: insertar método static MenuGrupo inicio
+
+        // añadir método nombreGrupochico de MenuGrupo
         System.out.print("Introduce el nombre del grupo: ");
+        String nombre = scannerString();
+
+        // Establecer el nombre del grupo
+        setNombre(nombre);
 
     }
+    public void agregaMiembro(Usuario u) throws UserInvalidException {
 
-    public void agregaMiembro(Usuario u) {
-        this.miembros.add(u);
+        // TODO: añadir titulo de yasir
+
+        // Mensaje informativo
+        System.out.println("Se procede a introducir un usuario en el grupo");
+
+        // Tengo que comprobar que no este ya registrado en el grupo
+        if (miembros.contains(u)) {
+            System.out.println("El usuario ya esta registrado en el grupo.");
+            throw new UserInvalidException("El usuario ya esta registrado en el grupo.");
+        }
+
+        System.out.println("El miembro ha sido añadido al grupo.");
+        // si no esta registrado agrego miembro a Set
+        miembros.add(u);
+
+
     }
     public void eliminaMiembro(Usuario u) {
         this.miembros.remove(u);
@@ -103,5 +127,6 @@ public class Grupo {
     public double scannerDouble() {
         return new Scanner(System.in).nextDouble();
     }
+
 
 }
