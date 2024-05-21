@@ -1,29 +1,59 @@
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class BaseDeDatos {
+    private static Connection connection;
+    private static String url;
 
-    // Conexión con bd
-    static String url = "jdbc:mysql://localhost:3337/prueba";
-    static Connection con;
+    BaseDeDatos() {
+        url = "jdbc:mysql://localhost:3337/tricount";
+    }
 
-    static {
+    //Iniciar la conexión con la base de datos
+    public static void iniciarSesion() {
+        connection = null;
         try {
-            con = DriverManager.getConnection(url, "root", "root");
+            connection = DriverManager.getConnection(url, "root", "root");
+            System.out.println("Conexion establecida");
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            System.out.println("Ha ocurrido un error al conectarse");
         }
+    }
+
+    //Finalizar la conexión con la base de datos
+    public static void cerrarSesion() {
+        try {
+            connection.close();
+            System.out.println("Conexion cerrada");
+        } catch (SQLException e) {
+            System.out.println("Ha ocurrido un error al cerrar la sesión");
+        }
+    }
+
+    //Insertar valores en la base de datos
+    public static void insertarValores(String sentencia) {
+        Statement statement = null;
+        try {
+            statement = connection.createStatement();
+            statement.executeUpdate(sentencia);
+            System.out.println("Datos insertados correctamente");
+        } catch (SQLException e) {
+            System.out.println("Ha ocurrido un error al introducir los datos");
+        }
+
     }
 
     //* Métodos de la base de datos
     // Obtener Lista con los nombres de los usuarios
     public List<Usuario> obtenerListaUsuarios () throws SQLException {
 
-        String sql = "SELECT * FROM usuarios";
+        // Inicia conexion bd
+        iniciarSesion();
 
-        // Consulta bd tabla gruposUsuarios
-        Statement sentencia = con.createStatement();
+        // Sentencia de captura
+        String sql = "SELECT * FROM usuarios";
+        Statement sentencia = connection.createStatement();
+
+        // captura informacion
         ResultSet usuarios = sentencia.executeQuery(sql);
 
         // Declaramos la lista
@@ -36,6 +66,8 @@ public class BaseDeDatos {
 
         usuarios.close();
         sentencia.close();
+
+        cerrarSesion();
 
         return list;
     }
