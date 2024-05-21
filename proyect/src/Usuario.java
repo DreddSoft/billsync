@@ -1,43 +1,62 @@
 
+import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
 public class Usuario implements Comparable<Usuario> {
 
-    //variables
+    //atributos
     private String nombre;
     private String password;
     private double balance;
-
+    private int idUsusario;
+    private DaseDatos bd;
 
     //constructor
     public Usuario() {
         this.balance = 0;
     }
 
+    public Usuario(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public Usuario(String nombre, String password) {
+        this.nombre = nombre;
+        this.password = password;
+        this.idUsuario = bd.obtenerIdUsuario(this.nombre);
+    }
+
     //getters y setters
     public String getPassword() {
         return password;
     }
-
     public void setPassword(String password) {
         this.password = password;
     }
-
     public String getNombre() {
         return nombre;
     }
-
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
-
     public double getBalance() {
         return balance;
     }
-
     public void setBalance(double balance) {
         this.balance = balance;
+    }
+    public int getIdUsusario() {
+        return idUsusario;
+    }
+    public void setIdUsusario(int idUsusario) {
+        this.idUsusario = idUsusario;
+    }
+    public DaseDatos getBd() {
+        return bd;
+    }
+    public void setBd(DaseDatos bd) {
+        this.bd = bd;
     }
 
     //metodos
@@ -120,7 +139,7 @@ public class Usuario implements Comparable<Usuario> {
         return true; //si cumple todas las condiciones, es valida
     }
 
-    public void generaGasto(double cantidad) { //metodo que genera un gasto
+    public void generarDeuda(double cantidad) { //metodo que genera un gasto
         this.balance -= cantidad; //restamos la cantidad al balance
     }
 
@@ -131,5 +150,43 @@ public class Usuario implements Comparable<Usuario> {
     @Override
     public int compareTo(Usuario o) { //metodo que compara dos usuarios
         return this.nombre.compareTo(o.nombre); //comparamos los nombres
+    }
+
+    public List<Usuario> obtenerListaUsuarios() { //metodo que obtiene una lista de usuarios
+        return bd.obtenerListaUsuarios(); //devolvemos la lista de usuarios
+    }
+
+    //Que compruebe si el nombre de usuario y que no coincida con otro
+    public void anadirUsuario() { //metodo que añade un usuario
+        try {
+            definirNombre(this.nombre); //definimos el nombre
+            definirPassword(this.password); //definimos la contraseña
+            anadirUsuario(new Usuario(this.nombre, this.password)); //añadimos el usuario
+        } catch (UserInvalidException e) { //capturamos la excepcion
+            System.out.println(e.getMessage()); //mostramos mensaje
+        }
+    }
+    public void anadirUsuario(Usuario u) { //metodo que añade un usuario
+        bd.insertarUsuario(u); //añadimos el usuario a la base de datos
+    }
+    //metodo para comprobar si el nombre de usuario esta y que no coincida con otro
+    public boolean comprobarNombreUsuario(String nombre) {
+        List<Usuario> listaUsuarios = bd.obtenerListaUsuarios(); //obtenemos la lista de usuarios
+        for (Usuario u : listaUsuarios) { //recorremos la lista
+            if (u.getNombre().equals(nombre)) { //si el nombre coincide con alguno de la lista
+                return false; //devolvemos false
+            }
+        }
+        return true; //si no coincide, devolvemos true
+    }
+    //metodo para comprobar actualizar la contraseña de usuario
+    public void actualizarPass(String nombre, String contrasena) {
+        List<Usuario> listaUsuarios = bd.obtenerListaUsuarios(); //obtenemos la lista de usuarios
+        for (Usuario u : listaUsuarios) { //recorremos la lista
+            if (u.getNombre().equals(nombre)) { //si el nombre coincide con alguno de la lista
+                u.setPassword(contrasena); //actualizamos la contraseña
+                bd.actualizarUsuario(u); //actualizamos el usuario en la base de datos
+            }
+        }
     }
 }
