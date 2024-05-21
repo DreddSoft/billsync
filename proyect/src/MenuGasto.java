@@ -29,13 +29,13 @@ public class MenuGasto {
         double coste = escaner.entradaDecimal();
 
         System.out.print('\n' + "Elija los participantes: ");
-        TreeSet<Usuario> participantes = crearListaParticipantes();
+        TreeSet<Usuario> participantes = crearConjuntoParticipantes();
 
         gasto = new Gasto(titulo, descripcion, coste, participantes, grupo.getAdmin, grupo.getIdGrupo, idCategoria);
         System.out.println("El gasto ha sido creado correctamente.");
     }
 
-    private TreeSet<Usuario> crearListaParticipantes() throws SQLException {
+    private TreeSet<Usuario> crearConjuntoParticipantes() throws SQLException {
         List<Usuario> listaUsuarios = bd.obtenerListaUsuarios();
         TreeSet<Usuario> conjuntoParticipantes = new TreeSet<Usuario>();
         int opcionParticipantes = -1;

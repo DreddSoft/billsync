@@ -62,7 +62,7 @@ public class BaseDeDatos {
 //    }
 
     //Métodos de la tabla "gastos"
-    public int agregarGasto(int idGrupo, String titulo, String descripcion, double coste, LocalDate fecha, int idPagador, int idCategoria) throws SQLException {
+    public int agregarGasto(int idGrupo, String titulo, String descripcion, double coste, Set<Usuario> participantes, LocalDate fecha, int idPagador, int idCategoria) throws SQLException {
         String sentenciaSQL = "INSERT INTO gastos (idGrupo, titulo, descripcion, coste, fecha, idPagador, idCategoria)" + "VALUES (?,?,?,?,?,?,?)";
 
         iniciarSesion();
@@ -86,7 +86,65 @@ public class BaseDeDatos {
         }
         cerrarSesion();
 
+        agregarConjuntoParticipantes(participantes, idGasto);
         return idGasto;
+    }
+    //Métodos de la tabla "gastosUsuarios"
+    public void agregarConjuntoParticipantes(Set<Usuario> participantes, int idGasto) {
+        for (Usuario usuario: participantes) {
+            agregarParticipante(usuario.getIdUsuario, idGasto);
+        }
+    }
+    public int agregarParticipante(int idUsuario, int idGasto) throws SQLException {
+        String sentenciaSQL = "INSERT INTO gastosUsuarios (idUsuario, idGasto, costeIndividual)" +
+                "VALUES (?,?,0)";
+
+        iniciarSesion();
+        PreparedStatement sentencia = connection.prepareStatement(sentenciaSQL);
+
+        sentencia.setInt(1, idUsuario);
+        sentencia.setInt(2, idGasto);
+
+        int filaAfectada = sentencia.executeUpdate();
+        System.out.println("El participante ha sido agregado al gasto correctamente");
+
+        ResultSet rs = sentencia.getGeneratedKeys();
+        int idGastoUsuario = 0;
+
+        while (rs.next()) {
+            idGastoUsuario = rs.getInt(filaAfectada);
+        }
+        cerrarSesion();
+
+        return idGastoUsuario;
+    }
+    public void eliminarParticipante(int idUsuario) throws SQLException {
+        String sentenciaSQL = "DELETE FROM gastosUsuarios WHERE idUsuario = ?";
+
+        iniciarSesion();
+        PreparedStatement sentencia = connection.prepareStatement(sentenciaSQL);
+
+        sentencia.setInt(1, idUsuario);
+        sentencia.executeUpdate();
+        System.out.println("El usuario ha sido eliminado correctamente");
+        cerrarSesion();
+    }
+    public Set<Usuario> obtenerParticipantes() throws SQLException {
+        String sentenciaSQL = "SELECT U.nombre FROM gastosUsuarios AS GU" +
+                "LEFT JOIN usuarios AS U ON U.id = GU.idUsuario";
+
+        iniciarSesion();
+        Statement sentencia = connection.createStatement();
+        ResultSet rs = sentencia.executeQuery(sentenciaSQL);
+
+        Set<Usuario> participantes = new TreeSet<>();
+
+        while (rs.next()) {
+            participantes.add(new Usuario(rs.getString("nombre")));
+        }
+        cerrarSesion();
+
+        return participantes;
     }
 
     //Métodos de la tabla "categorias"
@@ -168,58 +226,6 @@ public class BaseDeDatos {
         return idCat;
     }
 
-    //Métodos de la tabla "gastosUsuarios"
-    public int agregarParticipante(int idUsuario, int idGasto) throws SQLException {
-        String sentenciaSQL = "INSERT INTO gastosUsuarios (idUsuario, idGasto, costeIndividual)" +
-                "VALUES (?,?,0)";
-
-        iniciarSesion();
-        PreparedStatement sentencia = connection.prepareStatement(sentenciaSQL);
-
-        sentencia.setInt(1, idUsuario);
-        sentencia.setInt(2, idGasto);
-
-        int filaAfectada = sentencia.executeUpdate();
-        System.out.println("El participante ha sido agregado al gasto correctamente");
-
-        ResultSet rs = sentencia.getGeneratedKeys();
-        int idGastoUsuario = 0;
-
-        while (rs.next()) {
-            idGastoUsuario = rs.getInt(filaAfectada);
-        }
-        cerrarSesion();
-
-        return idGastoUsuario;
-    }
-    public void eliminarParticipante(int idUsuario) throws SQLException {
-        String sentenciaSQL = "DELETE FROM gastosUsuarios WHERE idUsuario = ?";
-
-        iniciarSesion();
-        PreparedStatement sentencia = connection.prepareStatement(sentenciaSQL);
-
-        sentencia.setInt(1, idUsuario);
-        sentencia.executeUpdate();
-        System.out.println("El usuario ha sido eliminado correctamente");
-        cerrarSesion();
-    }
-    public Set<Usuario> obtenerParticipantes() throws SQLException {
-        String sentenciaSQL = "SELECT U.nombre FROM gastosUsuarios AS GU" +
-                "LEFT JOIN usuarios AS U ON U.id = GU.idUsuario";
-
-        iniciarSesion();
-        Statement sentencia = connection.createStatement();
-        ResultSet rs = sentencia.executeQuery(sentenciaSQL);
-
-        Set<Usuario> participantes = new TreeSet<>();
-
-        while (rs.next()) {
-            participantes.add(new Usuario(rs.getString("nombre")));
-        }
-        cerrarSesion();
-
-        return participantes;
-    }
     public void actualizarDeudaIndividual(double coste) throws SQLException {
         String sentenciaSQL = "UPDATE gastosUsuarios SET costeIndividual = ?";
 

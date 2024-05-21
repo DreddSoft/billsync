@@ -19,7 +19,7 @@ public class Gasto {
 
     //CONSTRUCTORES
     public Gasto(String titulo, String descripcion, double coste, TreeSet<Usuario> participantes, Usuario pagador, int idGrupo, int idCategoria) {
-        this.idGasto = bd.agregarGasto(idGrupo, titulo, descripcion, coste, bd.obtenerIdUsuario(pagador.getNombre()), idCategoria);
+        this.idGasto = bd.agregarGasto(idGrupo, titulo, descripcion, coste, participantes, bd.obtenerIdUsuario(pagador.getNombre()), idCategoria);
         this.titulo = titulo;
         this.categoria = bd.obtenerNombreCategoria(idCategoria);
         this.descripcion = descripcion;
