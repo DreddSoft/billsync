@@ -1,7 +1,4 @@
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 public class BaseDeDatos {
     private static Connection connection;
@@ -43,5 +40,35 @@ public class BaseDeDatos {
             System.out.println("Ha ocurrido un error al introducir los datos");
         }
 
+    }
+
+    //* Métodos de la base de datos
+    // Obtener Lista con los nombres de los usuarios
+    public List<Usuario> obtenerListaUsuarios () throws SQLException {
+
+        // Inicia conexion bd
+        iniciarSesion();
+
+        // Sentencia de captura
+        String sql = "SELECT * FROM usuarios";
+        Statement sentencia = connection.createStatement();
+
+        // captura informacion
+        ResultSet usuarios = sentencia.executeQuery(sql);
+
+        // Declaramos la lista
+        List<Usuario> list = new ArrayList<>();
+
+        // Recorremos el ResultSet añadiendo los valores a la lista
+        while (usuarios.next()) {
+            list.add(new Usuario(usuarios.getString("nombre"), usuarios.getString("password")));
+        }
+
+        usuarios.close();
+        sentencia.close();
+
+        cerrarSesion();
+
+        return list;
     }
 }
