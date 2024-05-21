@@ -1,85 +1,76 @@
 import java.sql.SQLException;
 import java.util.List;
 import java.util.TreeSet;
+import java.time.LocalDate;
+import java.util.Set;
 
-public class MenuGasto {
-    private Escaner escaner;
-    private BaseDeDatos bd;
-    private Grupo grupo;
-    private Gasto gasto;
-    private int opcion;
+    public class MenuGasto extends Menu {
+        public static final String RESET = "\033[0m";
+        public static final String ANSI_BLUE_DARK = "\033[34m";    // Azul oscuro
+        public static final String ANSI_RED = "\u001B[31m";         //Rojo
+        public static final String ANSI_GREEN = "\u001B[32m";
+        public static final String ANSI_BOLD = "\u001B[1m";         //Negrita
+        public static final String ANSI_YELLOW = "\u001B[33m";//Amarillo
+        public static final String ANSI_ORANGE = "\u001B[38;5;208m"; // 208 es un valor aproximado para el color naranja
+        public static final String ANSI_PURPLE = "\u001B[38;5;201m"; // 201 es un valor aproximado para el color morado
+        public static final String ANSI_UNDERLINE = "\u001B[4m"; // Subrayado
+        public static final String ANSI_AZUL_CIELO = "\u001B[96m";
 
-    public MenuGasto() {
-        opcion = 0;
-    }
 
-    public void crearGasto() throws SQLException {
-        System.out.println("Para proceder con la creación del gasto, por favor, introduzca los siguientes datos:");
+        @Override
+        public void tituloSecundario() {
 
-        System.out.print("Título: ");
-        String titulo = escaner.entradaCadena();
-
-        System.out.print('\n' + "Descripción: ");
-        String descripcion = escaner.entradaCadena();
-
-        System.out.print('\n' + "Elija a continuación la categoría: ");
-        int idCategoria = obtenerCategoria();
-
-        System.out.print('\n' + "Coste del gasto: ");
-        double coste = escaner.entradaDecimal();
-
-        System.out.print('\n' + "Elija los participantes: ");
-        TreeSet<Usuario> participantes = crearConjuntoParticipantes();
-
-        gasto = new Gasto(titulo, descripcion, coste, participantes, grupo.getAdmin, grupo.getIdGrupo, idCategoria);
-        System.out.println("El gasto ha sido creado correctamente.");
-    }
-
-    private TreeSet<Usuario> crearConjuntoParticipantes() throws SQLException {
-        List<Usuario> listaUsuarios = bd.obtenerListaUsuarios();
-        TreeSet<Usuario> conjuntoParticipantes = new TreeSet<Usuario>();
-        int opcionParticipantes = -1;
-
-        //Recorremos la lista de usuarios imprimiendo uno por uno.
-        for (int i = 1; i<=listaUsuarios.size(); i++) {
-            System.out.println(i + ". " + listaUsuarios.get(i-1));
-        }
-        System.out.println("0. Terminar");
-
-        //Creamos un bucle para que el usuario decida los participantes del gasto.
-        while (opcionParticipantes != 0) {
-            opcionParticipantes = escaner.entradaEntero();
-            conjuntoParticipantes.add(listaUsuarios.get(opcionParticipantes));
         }
 
-        //Devolvemos el conjunto de los participantes
-        return conjuntoParticipantes;
-    }
-
-    private int obtenerCategoria() throws SQLException {
-        List<String> listaCategorias = bd.obtenerListaCategoria();
-        int opcionCategoria;
-        int listaSize = listaCategorias.size();
-
-        //Recorremos la lista con las categorias imprimiendo una a una
-        for (int i = 1; i<=listaCategorias.size(); i++) {
-            System.out.println(i + ". " + listaCategorias.get(i-1));
-        }
-        System.out.println(listaSize + ". Categoría Personalizada");
-
-        //Damos la opción al usuario de elegir la categoría
-        opcionCategoria = escaner.entradaEntero();
-        //Si este decide crear una nueva categoría, llamamos al método pertinente y almacenamos el id de la nueva categoría
-        if (opcionCategoria == listaSize) {
-            opcionCategoria = bd.agregarCategoria(categoriaPersonalizada());
+        @Override
+        public void subtitulo() {
+            System.out.println(
+                    ANSI_BLUE_DARK + "\t\t\t\t\t\t\t\t\t\t\t\t\t\t   ██████╗  █████╗ ███████╗████████╗ ██████╗ \n" +
+                            "\t\t\t\t\t\t\t\t\t\t\t\t\t\t  ██╔════╝ ██╔══██╗██╔════╝╚══██╔══╝██╔═══██╗\n" +
+                            "\t\t\t\t\t\t\t\t\t\t\t\t\t\t  ██║  ███╗███████║███████╗   ██║   ██║   ██║\n" +
+                            "\t\t\t\t\t\t\t\t\t\t\t\t\t\t  ██║   ██║██╔══██║╚════██║   ██║   ██║   ██║\n" +
+                            "\t\t\t\t\t\t\t\t\t\t\t\t\t\t  ╚██████╔╝██║  ██║███████║   ██║   ╚██████╔╝\n" +
+                            "\t\t\t\t\t\t\t\t\t\t\t\t\t\t   ╚═════╝ ╚═╝  ╚═╝╚══════╝   ╚═╝    ╚═════╝");
         }
 
-        //Devolvemos el id de la categoria seleccionada
-        return opcionCategoria;
+        @Override
+        public void subtitulo2() {
+
+        }
+
+        @Override
+        public void mensajeInicio() {
+
+        }
+
+        @Override
+        public void mensajeFin() {
+
+        }
+
+        public static void iniciaGasto(String tituloGasto, String descripcion, double coste, LocalDate fecha, String pagador, Set<String> participantes) {
+            // Imprimir el encabezado de la factura
+            System.out.println(ANSI_BOLD + "\t\t\tFACTURA" + RESET);
+            System.out.println(ANSI_BOLD + "------------------------------------" + RESET);
+
+            // Detalles del gasto
+            System.out.println(ANSI_BLUE_LIGHT + "Título del gasto: " + RESET + tituloGasto);
+            System.out.println(ANSI_YELLOW + "Descripción: " + RESET + descripcion);
+            System.out.println(ANSI_AZUL_CIELO + "Fecha: " + RESET + fecha);
+            // Resaltando el pagador con un color diferente
+            System.out.println(ANSI_UNDERLINE + ANSI_PURPLE + "Pagador: " + pagador + RESET);
+
+            // Participantes
+            System.out.println(ANSI_BOLD + "Participantes:" + RESET);
+            participantes.forEach(participante -> System.out.println("   - " + participante));
+
+            // Total
+            System.out.println(ANSI_BOLD + "------------------------------------" + RESET);
+            System.out.println(ANSI_GREEN + ANSI_BOLD + "Total: " + coste + "€" + RESET);
+            System.out.println();
+        }
+
+        public void finalizaGasto() {
+            System.out.println(RESET + ANSI_GREEN + ANSI_BOLD + ANSI_UNDERLINE + "\uD835\uDC6E\uD835\uDC82\uD835\uDC94\uD835\uDC95\uD835\uDC90 \uD835\uDC87\uD835\uDC8A\uD835\uDC8F\uD835\uDC82\uD835\uDC8D\uD835\uDC8A\uD835\uDC9B\uD835\uDC82\uD835\uDC85\uD835\uDC90");
+        }
     }
-    //Función para crear una categoría personalizada y devolver su id
-    private String categoriaPersonalizada() {
-        System.out.println("Introduzca a continuación el nombre de la nueva categoría:");
-        return escaner.entradaCadena();
-    }
-}
