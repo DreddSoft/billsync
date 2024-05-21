@@ -13,6 +13,14 @@ public class BaseDeDatos {
         url = "jdbc:mysql://localhost:3337/tricount";
     }
 
+    //Getters y Setters de la URL
+    public static String getUrl() {
+        return url;
+    }
+    public static void setUrl(String url) {
+        BaseDeDatos.url = url;
+    }
+
     //MÉTODOS
 
     //Iniciar la conexión con la base de datos
@@ -126,6 +134,26 @@ public class BaseDeDatos {
         cerrarSesion();
 
         return idCat;
+    }
+    public List<String> obtenerListaCategoria () throws SQLException {
+        iniciarSesion();
+
+        // Captura de información
+        String sentenciaSQL = "SELECT nombre FROM categorias";
+        Statement sentencia = connection.createStatement();
+        ResultSet rs = sentencia.executeQuery(sentenciaSQL);
+
+        // Declaramos la lista y Recorremos el ResultSet añadiendo los valores a la lista
+        List<String> listaCategorias = new ArrayList<>();
+        while (rs.next()) {
+            listaCategorias.add(rs.getString(1));
+        }
+
+        rs.close();
+        sentencia.close();
+        cerrarSesion();
+
+        return listaCategorias;
     }
     public int obtenerCategoriaDeGasto(int idGasto) throws SQLException {
         String sentenciaSQL = "SELECT categorias.id FROM categorias" +
