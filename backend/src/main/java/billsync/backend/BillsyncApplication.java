@@ -1,13 +1,13 @@
-package com.billsync.app;
+package billsync.backend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class AppApplication {
+public class BillsyncApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(AppApplication.class, args);
+		SpringApplication.run(BillsyncApplication.class, args);
 	}
 
 }
